@@ -8,6 +8,8 @@ import {Math} from "@openzeppelin/contracts/utils/Math/Math.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract DCI_UniswapV2 is ERC20("DCI-UNIV2", "DCI-UNI"), ReentrancyGuard {
+    using SafeERC20 for IERC20;
+
     uint256 reserve0;
     uint256 reserve1;
 
@@ -43,8 +45,8 @@ contract DCI_UniswapV2 is ERC20("DCI-UNIV2", "DCI-UNI"), ReentrancyGuard {
         SafeERC20.safeTransferFrom(token1, msg.sender, address(this), amount1);
 
         if (_ts == 0) {
-            liquidity = Math.sqrt((amount0Desired * amount1Desired) - MIN_LIQUIDITY);
-            _mint(address(0), MIN_LIQUIDITY);
+            liquidity = Math.sqrt(amount0Desired * amount1Desired) - MIN_LIQUIDITY;
+            _update(address(0), address(0), MIN_LIQUIDITY);
         } else {
             liquidity = Math.min((amount0 * _ts) / _r0, (amount1 * _ts) / _r1);
         }
