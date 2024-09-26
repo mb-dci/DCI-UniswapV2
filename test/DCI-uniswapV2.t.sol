@@ -65,8 +65,12 @@ contract DCI_UniswapV2Test is Test {
         console.log(amount0, amount1, liquidity);
 
         assertEq(pairContract.totalSupply(), expectedLiquidity);
-        
-
+        assertEq(pairContract.balanceOf(walletAddress), expectedLiquidity - 10**3);
+        assertEq(token0Contract.balanceOf(address(pairContract)), amount0);
+        assertEq(token1Contract.balanceOf(address(pairContract)), amount1);
+        (uint256 _reserve0, uint256 _reserve1) = pairContract.getReserves();
+        assertEq(_reserve0, amount0);
+        assertEq(_reserve1, amount1);
     }
 
     function test_burn() public {

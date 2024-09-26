@@ -2,12 +2,15 @@
 
 pragma solidity 0.8.26;
 
-import {ERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Math} from "@openzeppelin/contracts/utils/Math/Math.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {ERC20} from "lib/solady/src/tokens/ERC20.sol";
 
-contract DCI_UniswapV2 is ERC20("DCI-UNIV2", "DCI-UNI"), ReentrancyGuard {
+// contract DCI_UniswapV2 is ERC20("DCI-UNIV2", "DCI-UNI"), ReentrancyGuard {
+contract DCI_UniswapV2 is ERC20, ReentrancyGuard {
+
     using SafeERC20 for IERC20;
 
     uint256 reserve0;
@@ -28,7 +31,20 @@ contract DCI_UniswapV2 is ERC20("DCI-UNIV2", "DCI-UNI"), ReentrancyGuard {
         token1 = _token1;
     }
 
+    function name() public pure override returns (string memory) {
+        return "DCI-UNIV2";
+    }
+
+    function symbol() public pure override returns (string memory) {
+        return "DCI-UNI";
+    }
+
     /////////////////////// External Functions ////////////////////////
+
+    function getReserves() public view returns (uint256 _reserve0, uint256 _reserve1) {
+        _reserve0 = reserve0;
+        _reserve1 = reserve1;
+    } 
 
     function mint(uint256 amount0Desired, uint256 amount1Desired, uint256 amount0min, uint256 amount1min)
         external
@@ -46,7 +62,7 @@ contract DCI_UniswapV2 is ERC20("DCI-UNIV2", "DCI-UNI"), ReentrancyGuard {
 
         if (_ts == 0) {
             liquidity = Math.sqrt(amount0Desired * amount1Desired) - MIN_LIQUIDITY;
-            _update(address(0), address(0), MIN_LIQUIDITY);
+            _mint(address(0), MIN_LIQUIDITY);
         } else {
             liquidity = Math.min((amount0 * _ts) / _r0, (amount1 * _ts) / _r1);
         }
