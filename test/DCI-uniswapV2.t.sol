@@ -27,6 +27,10 @@ contract DCI_UniswapV2Test is Test {
         token1Contract = new token1();
         pairContract = new DCI_UniswapV2(token0Contract, token1Contract);
         walletAddress = vm.addr(1);
+        vm.label(walletAddress, "walletAddress");
+        vm.label(address(pairContract), "pairContract");
+        vm.label(address(token0Contract), "token0Contract");
+        vm.label(address(token1Contract), "token1Contract");
     }
 
     function test_mint() public {
@@ -49,23 +53,22 @@ contract DCI_UniswapV2Test is Test {
         emit IERC20.Transfer(walletAddress, address(pairContract), token1amount);
 
         vm.expectEmit(address(pairContract));
-        emit IERC20.Transfer(address(0), address(0), 10**3);
+        emit IERC20.Transfer(address(0), address(0), 10 ** 3);
 
         vm.expectEmit(address(pairContract));
-        emit IERC20.Transfer(address(0), walletAddress, expectedLiquidity - 10**3);
+        emit IERC20.Transfer(address(0), walletAddress, expectedLiquidity - 10 ** 3);
 
         vm.expectEmit(address(pairContract));
         emit DCI_UniswapV2.Sync(token0amount, token1amount);
 
         vm.expectEmit(address(pairContract));
-        emit DCI_UniswapV2.Mint(walletAddress, token0amount, token1amount, expectedLiquidity - 10**3);
+        emit DCI_UniswapV2.Mint(walletAddress, token0amount, token1amount, expectedLiquidity - 10 ** 3);
 
         (uint256 amount0, uint256 amount1, uint256 liquidity) =
             pairContract.mint(token0amount, token1amount, 8e17, 32e17);
-        console.log(amount0, amount1, liquidity);
 
         assertEq(pairContract.totalSupply(), expectedLiquidity);
-        assertEq(pairContract.balanceOf(walletAddress), expectedLiquidity - 10**3);
+        assertEq(pairContract.balanceOf(walletAddress), expectedLiquidity - 10 ** 3);
         assertEq(token0Contract.balanceOf(address(pairContract)), amount0);
         assertEq(token1Contract.balanceOf(address(pairContract)), amount1);
         (uint256 _reserve0, uint256 _reserve1) = pairContract.getReserves();
@@ -74,7 +77,43 @@ contract DCI_UniswapV2Test is Test {
     }
 
     function test_burn() public {
-        //
+        // setup
+        uint256 token0amount = 3 ether;
+        uint256 token1amount = 3 ether;
+        token0Contract.mint(walletAddress, token0amount);
+        token1Contract.mint(walletAddress, token1amount);
+        vm.startPrank(walletAddress);
+        token0Contract.approve(address(pairContract), token0amount);
+        token1Contract.approve(address(pairContract), token1amount);
+        (uint256 amount0, uint256 amount1, uint256 liquidity) =
+            pairContract.mint(token0amount, token1amount, 28e17, 28e17);
+
+        // test
+        vm.expectEmit(address(pairContract));
+        emit IERC20.Transfer(walletAddress, address(0), liquidity);
+
+        vm.expectEmit(address(token0Contract));
+        emit IERC20.Transfer(address(pairContract), walletAddress, amount0 - 1000);
+
+        vm.expectEmit(address(token1Contract));
+        emit IERC20.Transfer(address(pairContract), walletAddress, amount1 - 1000);
+
+        vm.expectEmit(address(pairContract));
+        emit DCI_UniswapV2.Sync(1000, 1000);
+
+        vm.expectEmit(address(pairContract));
+        emit DCI_UniswapV2.Burn(walletAddress, liquidity, amount0 - 1000, amount1 - 1000);
+
+        (uint256 amount0returned, uint256 amount1returned) =
+            pairContract.burn(liquidity, amount0 - 10001, amount1 - 10001);
+
+        assertEq(pairContract.totalSupply(), 1000);
+        assertEq(token0Contract.balanceOf(address(pairContract)), 1000);
+        assertEq(token1Contract.balanceOf(address(pairContract)), 1000);
+        uint256 _ts0 = token0Contract.totalSupply();
+        assertEq(token0Contract.balanceOf(walletAddress), _ts0 - 1000);
+        uint256 _ts1 = token1Contract.totalSupply();
+        assertEq(token0Contract.balanceOf(walletAddress), _ts1 - 1000);
     }
 
     function test_swap() public {

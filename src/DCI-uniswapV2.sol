@@ -10,7 +10,6 @@ import {ERC20} from "lib/solady/src/tokens/ERC20.sol";
 
 // contract DCI_UniswapV2 is ERC20("DCI-UNIV2", "DCI-UNI"), ReentrancyGuard {
 contract DCI_UniswapV2 is ERC20, ReentrancyGuard {
-
     using SafeERC20 for IERC20;
 
     uint256 reserve0;
@@ -44,7 +43,7 @@ contract DCI_UniswapV2 is ERC20, ReentrancyGuard {
     function getReserves() public view returns (uint256 _reserve0, uint256 _reserve1) {
         _reserve0 = reserve0;
         _reserve1 = reserve1;
-    } 
+    }
 
     function mint(uint256 amount0Desired, uint256 amount1Desired, uint256 amount0min, uint256 amount1min)
         external
@@ -79,8 +78,6 @@ contract DCI_UniswapV2 is ERC20, ReentrancyGuard {
         nonReentrant
         returns (uint256 amount0, uint256 amount1)
     {
-        _burn(msg.sender, liquidity);
-
         uint256 _ts = totalSupply(); // gas savings
 
         amount0 = (liquidity * reserve0) / _ts;
@@ -89,6 +86,7 @@ contract DCI_UniswapV2 is ERC20, ReentrancyGuard {
         require(amount0 > amount0min, "DCI_UniswapV2: Insufficient amount0 out");
         require(amount1 > amount1min, "DCI_UniswapV2: Insufficient amount1 out");
 
+        _burn(msg.sender, liquidity);
         SafeERC20.safeTransfer(token0, msg.sender, amount0);
         SafeERC20.safeTransfer(token1, msg.sender, amount1);
 
