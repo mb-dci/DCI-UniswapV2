@@ -152,7 +152,7 @@ contract DCI_UniswapV2 is ERC20, ReentrancyGuard {
         returns (uint256 amount1In)
     {
         require(block.timestamp < deadline, "DCI_UniswapV2: Deadline passed for swap");
-        amount1In = reserve1 - ((reserve0 * reserve1) / (reserve0 - amount0Out));
+        amount1In = ((reserve0 * reserve1) / (reserve0 - amount0Out)) - reserve1;
         require(amount1In < amount1InMax, "DCI_UniswapV2: Insufficient amount1 in");
 
         SafeERC20.safeTransferFrom(token1, msg.sender, address(this), amount1In);
