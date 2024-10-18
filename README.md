@@ -1,6 +1,4 @@
-WIP: Implement factory contract and foundry tests.
-
-# Uniswap V2 Clone
+# DCI-Uniswap V2
 
 This repository contains a re-implementation of the **Uniswap V2** decentralized exchange protocol, designed with modern Solidity practices and improved gas efficiency. The contracts follow the original Uniswap V2 architecture but introduce optimizations, enhanced security, and compliance with the latest Ethereum standards.
 
