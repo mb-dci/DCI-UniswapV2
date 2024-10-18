@@ -8,7 +8,6 @@ import {Math} from "@openzeppelin/contracts/utils/Math/Math.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ERC20} from "lib/solady/src/tokens/ERC20.sol";
 
-// contract DCI_UniswapV2 is ERC20("DCI-UNIV2", "DCI-UNI"), ReentrancyGuard {
 contract DCI_UniswapV2 is ERC20, ReentrancyGuard {
     using SafeERC20 for IERC20;
 

@@ -200,8 +200,8 @@ contract DCI_UniswapV2Test is Test {
         // setup
         uint256 token0amount = 5 ether;
         uint256 token1amount = 10 ether;
-        uint256 swapAmount = 1 ether;
-        uint256 expectedOutputAmount = 454545454545454546;
+        uint256 swapAmount = 1666666666666666667;
+        uint256 expectedOutputAmount = 1 ether;
         token0Contract.mint(walletAddress, token0amount);
         token1Contract.mint(walletAddress, token1amount + swapAmount);
         vm.startPrank(walletAddress);
